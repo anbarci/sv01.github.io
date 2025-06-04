@@ -1,0 +1,80 @@
+#!/bin/bash
+# automated_setup.sh
+
+set -e  # Hata durumunda dur
+
+echo "🚀 OTTOMAN MINER + YOLOv4 KURULUMU BAŞLIYOR..."
+echo "================================================"
+
+# 1. Sistem güncellemesi
+echo "📦 Sistem paketleri kuruluyor..."
+sudo apt update && sudo apt upgrade -y
+
+# 2. Temel paketler
+sudo apt install -y \
+    python3 python3-pip python3-venv python3-dev \
+    git wget curl unzip build-essential cmake \
+    libopencv-dev python3-opencv \
+    poppler-utils tesseract-ocr tesseract-ocr-tur \
+    fonts-liberation
+
+# 3. Proje dizini
+echo "📁 Proje dizini oluşturuluyor..."
+mkdir -p ~/ottoman-project
+cd ~/ottoman-project
+
+# 4. Virtual environment
+echo "🐍 Python ortamı hazırlanıyor..."
+python3 -m venv ottoman_env
+source ottoman_env/bin/activate
+
+# 5. Requirements
+echo "📚 Python paketleri kuruluyor..."
+cat > requirements.txt << 'EOF'
+torch>=1.9.0
+torchvision>=0.10.0
+opencv-python>=4.5.0
+numpy>=1.21.0
+pillow>=8.3.0
+ultralytics>=8.0.0
+scikit-learn>=1.0.0
+pandas>=1.3.0
+flask>=2.0.0
+tqdm>=4.62.0
+click>=8.0.0
+PyYAML>=6.0
+loguru>=0.5.3
+requests>=2.26.0
+pytesseract>=0.3.8
+EOF
+
+pip install --upgrade pip
+pip install -r requirements.txt
+
+# 6. Dizin yapısı
+echo "📂 Dizin yapısı oluşturuluyor..."
+mkdir -p {data/{raw,processed,models,outputs},src/{core,detection,analysis,utils,api},config,logs,tests,scripts,weights}
+touch src/__init__.py src/core/__init__.py src/detection/__init__.py src/analysis/__init__.py src/utils/__init__.py src/api/__init__.py
+
+# 7. Aktivasyon script'i
+cat > activate.sh << 'EOF'
+#!/bin/bash
+cd ~/ottoman-project
+source ottoman_env/bin/activate
+echo "✅ Ottoman Miner ortamı aktive edildi!"
+echo "Dizin: $(pwd)"
+echo "Python: $(which python)"
+EOF
+chmod +x activate.sh
+
+echo ""
+echo "🎉 KURULUM TAMAMLANDI!"
+echo "======================"
+echo ""
+echo "🔧 Kullanım:"
+echo "   cd ~/ottoman-project"
+echo "   source ottoman_env/bin/activate"
+echo "   # veya"
+echo "   ./activate.sh"
+echo ""
+echo "📍 Sonraki adım için hazır!"
